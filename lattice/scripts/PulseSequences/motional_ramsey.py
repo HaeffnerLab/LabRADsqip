@@ -1,1 +1,0 @@
-# motional ramsey
