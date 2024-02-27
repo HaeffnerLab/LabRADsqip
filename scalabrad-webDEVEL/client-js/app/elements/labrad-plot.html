@@ -1,0 +1,109 @@
+<link rel="import" href="../bower_components/paper-checkbox/paper-checkbox.html">
+<link rel="import" href="../bower_components/paper-radio-group/paper-radio-group.html">
+<link rel="import" href="../bower_components/paper-radio-button/paper-radio-button.html">
+
+<dom-module id="labrad-plot">
+  <style>
+    :host {
+      height: 100%;
+      display: flex;
+      flex-direction: row;
+      position: relative;
+    }
+    #plot {
+      display: flex;
+      flex-grow: 1;
+      width: 400px;
+      min-height: 400px;
+    }
+    #pos {
+      position: absolute;
+      top: 20px;
+      left: 40px;
+      font-family: monospace;
+    }
+    #buttons {
+      display: flex;
+      flex-direction: column;
+      width: 40px;
+      text-align: center;
+    }
+    #rect {
+      margin-top: 40px;
+    }
+    #home {
+      margin-top: 20px;
+    }
+    #dots {
+      margin-top: 40px;
+    }
+    #plot {
+      position: relative;
+    }
+    #canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+    #zoomRectangle {
+      background-color: #eee;
+      opacity: 0.5;
+      cursor: crosshair;
+      position: absolute;
+      border: 2px solid #f00;
+      display: none;
+    }
+  </style>
+  <template>
+    <div id="plot"></div>
+    <div id="canvas"></div>
+    <div id="zoomRectangle"></div>
+    <div id="pos">Current Position: <span>{{currPos}}</span></div>
+    <div id="buttons">
+      <paper-icon-button icon="tab-unselected" id="rect" on-click="mouseModeSelectorZoomRect" title="drag to zoom"></paper-icon-button>
+      <paper-icon-button icon="open-with" id="pan" on-click="mouseModeSelectorPan" title="drag to pan"></paper-icon-button>
+      <paper-icon-button icon="home" id="home" on-click="resetZoomControl" title="zoom out"></paper-icon-button>
+      <paper-icon-button icon="list" id="select" on-click="traceSelectorOpen" title="select trace"></paper-icon-button>
+      <div id="modes2d">
+        <paper-icon-button icon="av:stop" id="dots" on-click="drawMode2DSelectorDots" title="draw with dots"></paper-icon-button>
+        <paper-icon-button icon="dashboard" id="rectfill" on-click="drawMode2DSelectorRectfill" title="draw with rect fill"></paper-icon-button>
+        <paper-icon-button icon="view-list" id="vargrid" on-click="drawMode2DSelectorVargrid" title="draw with vargrid"></paper-icon-button>
+      </div>
+    </div>
+
+    <paper-dialog id="traceSelector">
+      <h1>Select Traces</h1>
+      <paper-dialog-scrollable>
+        <form is="iron-form" id="selectForm">
+          <template is="dom-if" if="{{is1D}}">
+            <template is="dom-repeat" items="{{deps}}">
+              <div>
+                <paper-checkbox checked name="traces" trace-index="{{index}}">{{index}}</paper-checkbox>
+                <span> - </span><span>{{item.label}}</span>
+                (<span>{{item.legend}}</span>) [<span>{{item.unit}}</span>]
+              </div>
+            </template>
+            <div id="selectButtons">
+              <paper-button on-click="traceSelectorSelectAll">Select All</paper-button>
+              <paper-button on-click="traceSelectorSelectNone">Select None</paper-button>
+            </div>
+          </template>
+          <template is="dom-if" if="{{is2D}}">
+            <paper-radio-group selected="0" attr-for-selected="index" name="radioGroup">
+              <template is="dom-repeat" items="{{deps}}">
+                <paper-radio-button name="{{item.label}}" index="{{index}}">
+                  <span>{{item.label}}</span>
+                  (<span>{{item.legend}}</span>) [<span>{{item.unit}}</span>]
+                </paper-radio-button>
+              </template>
+            </paper-radio-group>
+          </template>
+        </form>
+      </paper-dialog-scrollable>
+      <div id="submitButtons" style="display:inline">
+        <paper-button raised on-click="traceSelectorSubmit">OK</paper-button>
+        <paper-button raised dialog-dismiss>Cancel</paper-button>
+      </div>
+    </paper-dialog>
+  </template>
+</dom-module>

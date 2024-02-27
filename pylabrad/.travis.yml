@@ -1,0 +1,21 @@
+language: python
+sudo: false
+python:
+  - "2.7"
+install:
+  - cat requirements.txt | perl -p -i -e 's/>=/==/g' > exact_requirements.txt
+  - pip install -r exact_requirements.txt
+  - pip install .
+  - pip install pytest coveralls
+env:
+  - SCALABRAD_VERSION=0.5.1
+cache:
+  directories:
+    - $HOME/scalabrad-$SCALABRAD_VERSION
+before_script:
+  - bash scripts/test/install-scalabrad.sh
+  - export PATH=$PATH:$HOME/scalabrad-$SCALABRAD_VERSION/bin/
+script: scripts/test/test.sh
+after_success:
+  - coveralls
+

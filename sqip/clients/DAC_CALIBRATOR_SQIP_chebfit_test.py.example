@@ -1,0 +1,185 @@
+import sys
+from PyQt4 import QtGui
+from PyQt4 import QtCore,uic
+from qtui.QDACCalibrator import QDACCalibrator
+import time
+import numpy as np
+import matplotlib.pyplot as plt
+import datetime
+
+class DAC_CALIBRATOR(QDACCalibrator):
+    def __init__(self, cxn, parent=None):
+        self.dacserver = cxn.dac_server
+        self.dmmserver = cxn.keithley_2100_dmm
+        self.datavault = cxn.data_vault
+        self.r = cxn.registry
+
+        QDACCalibrator.__init__(self, parent)
+
+        self.clicked = False # state of the "Calibrate" button
+
+        # Connect functions
+        # self.spinPower.valueChanged.connect(self.powerChanged)
+        self.start.released.connect(self.buttonClicked)
+        print self.checksave.isChecked()
+        print self.checkreverse.isChecked()
+        print self.customsave.isChecked()
+    # This is where the magic happens
+    def calib(self):
+        
+        stepsize = 500
+        #stepsize = 0b1
+        reverserange = False
+        #self.digVoltages = range(0, 2**16, stepsize) # digital voltages we're going to iterate over
+        if self.checkreverse.isChecked() == False:
+            self.digVoltages = range(2**12+2000, 2**16-2**12, stepsize)
+            #self.digVoltages = range(int(2**14.579), int(2**14.59), stepsize)
+            print 'normal Voltage Scan'
+        else:
+            self.digVoltages = range(2**16-2**12, 2**12+2000, -stepsize)
+            #self.digVoltages = range(int(2**14.59), int(2**14.579), -stepsize)
+            print 'inverted Voltage Scan'
+        self.anaVoltages = [] # corresponding analog voltages in volts
+        #self.dacserver.set_individual_digital_voltages([(int(self.channelToCalib), 0)])
+        self.dacserver.set_individual_digital_voltages([(self.channelToCalib, 0)])
+        #time.sleep(1)
+        for dv in self.digVoltages: # iterate over digital voltages
+
+            #self.dacserver.set_individual_digital_voltages([(int(self.channelToCalib), dv)]) 
+            self.dacserver.set_individual_digital_voltages([(self.channelToCalib, dv)]) 
+            #print int(self.channelToCalib)
+ 
+            time.sleep(1.6)
+            
+            av = self.dmmserver.get_dc_volts()
+
+            time.sleep(.5)
+           
+            self.anaVoltages.append(av)
+            print dv, "; ", av
+        
+        plt.figure(1)
+        plt.plot(self.anaVoltages,self.digVoltages, 'ro')
+        plt.title('Initial digital vs. analog voltages')
+        plt.show()
+       
+        fit = np.polynomial.chebyshev.chebfit(self.anaVoltages,self.digVoltages, 20) 
+        
+        # fitting in order to find & discard the digital voltage with the jump
+        fitvals = np.polynomial.chebyshev.chebval(self.anaVoltages, fit)
+        diffs = fitvals - self.digVoltages
+        sdev = np.std(diffs)
+        print sdev
+        indices = np.where(np.abs(diffs) > (3*sdev))
+        print indices
+        #print self.digVoltages[indices[0]]
+        self.digVoltages = np.delete(self.digVoltages, indices)
+        self.anaVoltages = np.delete(self.anaVoltages, indices)
+        fit = np.polynomial.chebyshev.chebfit(self.anaVoltages,self.digVoltages, 20) 
+        
+        # Save the raw data to the datavault
+        if self.checksave.isChecked() == True:         
+            now = time.ctime()
+            self.datavault.cd( ( ['DACCalibrations', self.channelToCalib], True ) )
+            self.datavault.new( (now, [('Digital voltage', 'num')], [('Volts','Analog Voltage','v')]) )
+            self.datavault.add( np.array([self.digVoltages, self.anaVoltages]).transpose().tolist() )
+            self.datavault.cd( ( [''] ))
+            
+            print 'stored to data vault: DACCalibrations Channel'+str(self.channelToCalib)
+            # Update the registry with the new calibration
+            self.r.cd( ( ['Calibrations', self.channelToCalib], True ) )
+            self.r.set( ( 'c0', fit[0] ) )
+            self.r.set( ( 'c1', fit[1] ) )
+            self.r.set( ( 'c2', fit[2] ) )
+            self.r.set( ( 'c3', fit[3] ) )
+            self.r.set( ( 'c4', fit[4] ) )
+            self.r.set( ( 'c5', fit[5] ) )
+            self.r.set( ( 'c6', fit[6] ) )
+            self.r.set( ( 'c7', fit[7] ) )
+            self.r.set( ( 'c8', fit[8] ) )
+            self.r.set( ( 'c9', fit[9] ) )
+            self.r.set( ( 'c10', fit[10] ) )
+            self.r.set( ( 'c11', fit[11] ) )
+            self.r.set( ( 'c12', fit[12] ) )
+            self.r.set( ( 'c13', fit[13] ) )
+            self.r.set( ( 'c14', fit[14] ) )
+            self.r.set( ( 'c15', fit[15] ) )
+            self.r.set( ( 'c16', fit[16] ) )
+            self.r.set( ( 'c17', fit[17] ) )
+            self.r.set( ( 'c18', fit[18] ) )
+            self.r.set( ( 'c19', fit[19] ) )
+            self.r.cd( ( [''] ))
+            print 'Calibration stored in registry'
+        else:
+            print 'current Calibration NOT stored!'
+        
+        if self.customsave.isChecked() == True:
+            now = time.ctime()
+            self.datavault.cd( ( ['DACCalibrations', 'Channel_tests'], True ) )
+            self.datavault.new( (str(now)+' - '+str(self.datainfo.text()), [('Digital voltage', 'num')], [('Volts','Analog Voltage','v')]) )
+            self.datavault.add( np.array([self.digVoltages, self.anaVoltages]).transpose().tolist() )
+            self.datavault.cd( ( [''] ))
+            print 'Data set was stored separately as: '+str(now)+' - '+str(self.datainfo.text())
+        else:
+            print 'Data set was NOT stored separately!'
+            
+        return fit
+
+        
+
+    def buttonClicked(self):
+#        if(self.port.text()<10):
+#            self.channelToCalib = str(self.port.text()) 
+#            self.channelToCalib = self.channelToCalib + ' ' + 'b'
+#            print self.channelToCalib
+#        else:
+#            self.channelToCalib = str(self.port.text())
+        self.channelToCalib = str(self.port.text()) 
+        self.channelToCalib = self.channelToCalib + ' ' 
+        print self.channelToCalib
+
+        #self.channelToCalib = str(self.port.text())
+        #print self.channelToCalib
+        
+        self.clicked = True
+        fit = self.calib() # Now calibrate
+        
+#        The following results not applicable here with the new 20th order chebyshev fitting         
+#        self.results.setText('RESULTS')
+#        self.y_int.setText('Intercept: ' + str(fit[2]))
+#        self.slope.setText('Slope: ' + str(fit[1]))
+#        self.order2.setText('Nonlinearity: ' + str(fit[0]))
+        
+        fitvals = np.polynomial.chebyshev.chebval(self.anaVoltages, fit)
+        diffs = fitvals - self.digVoltages
+        """
+        m = 20./(2**16 - 1) #normal DAC output voltage range without any amplifiera
+        b = -10
+        idealVals = np.array([(m*v + b)*4 for v in self.digVoltages]) #factor four accounts for the amplifier +-40Volts
+        uncalDiffs = idealVals - self.anaVoltages
+        """
+        print "MAX DEVIATION: ", max(abs(diffs)), " bits (1 digital step is 1.2mV) "
+        plt.figure(2)
+        plt.plot(self.anaVoltages, (1.0 * diffs), '-o')
+        plt.xlabel('Analog voltage')
+        plt.ylabel('Difference between fitted & initial dig. voltage (mV)')
+        plt.title('Deviation from nominal settings (mV)')
+        
+        plt.figure(3)
+        plt.plot(self.anaVoltages, self.digVoltages, 'ro')
+        plt.plot(self.anaVoltages, fitvals)
+        plt.title('Fitted digital voltages vs analog voltages')
+        plt.show()
+
+if __name__=="__main__":
+    import labrad
+    cxn = labrad.connect()
+    dacserver = cxn.dac_server
+    dmmserver = cxn.keithley_2100_dmm
+    datavault = cxn.data_vault
+    registry = cxn.registry
+    dmmserver.select_device('sqip_expcontrol GPIB Bus - USB0::0x05E6::0x2100::1243106')
+    app = QtGui.QApplication(sys.argv)
+    icon = DAC_CALIBRATOR(cxn)
+    icon.show()
+    app.exec_()

@@ -1,0 +1,70 @@
+{
+  "name": "labrad-browser",
+  "version": "0.0.0",
+  "description": "A web interface for labrad",
+  "repository": "labrad/scalabrad-web",
+  "license": "MIT",
+  "scripts": {
+    "bower": "bower",
+    "gulp": "gulp",
+    "jspm": "jspm",
+    "test": "gulp test"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "bower": "^1.7.9",
+    "browser-sync": "^2.6.4",
+    "del": "^1.1.1",
+    "git-describe": "^3.0.0",
+    "glob": "^5.0.6",
+    "gulp": "^3.8.5",
+    "gulp-autoprefixer": "^2.1.0",
+    "gulp-cache": "^0.2.8",
+    "gulp-changed": "^1.0.0",
+    "gulp-cssmin": "^0.1.7",
+    "gulp-flatten": "0.0.4",
+    "gulp-htmlmin": "^2.0.0",
+    "gulp-if": "^1.2.1",
+    "gulp-imagemin": "^2.2.1",
+    "gulp-jasmine": "^2.2.1",
+    "gulp-jasmine-browser": "0.2.3",
+    "gulp-jshint": "^1.6.3",
+    "gulp-load-plugins": "^0.10.0",
+    "gulp-rename": "^1.2.0",
+    "gulp-replace": "^0.5.3",
+    "gulp-size": "^1.0.0",
+    "gulp-sourcemaps": "^1.5.2",
+    "gulp-tslint": "^3.0.1-beta",
+    "gulp-typescript": "^2.8.1",
+    "gulp-uglify": "^1.2.0",
+    "gulp-uncss": "^1.0.1",
+    "gulp-useref": "^1.1.2",
+    "gulp-util": "^3.0.5",
+    "gulp-vulcanize": "^6.0.0",
+    "jasmine": "2.4.1",
+    "jshint-stylish": "^2.0.0",
+    "jspm": "^0.15.7",
+    "merge-stream": "^0.1.7",
+    "merge2": "^0.3.6",
+    "minimist": "^1.2.0",
+    "require-dir": "^0.3.0",
+    "run-sequence": "^1.0.2",
+    "typescript": "^1.8.0",
+    "vulcanize": ">= 1.4.2"
+  },
+  "engines": {
+    "node": ">=0.10.0"
+  },
+  "jspm": {
+    "directories": {},
+    "dependencies": {
+      "d3": "github:d3/d3@^3.5.17",
+      "page": "npm:page@^1.6.3",
+      "three": "github:mrdoob/three.js@r78"
+    },
+    "devDependencies": {
+      "traceur": "github:jmcriffey/bower-traceur@0.0.88",
+      "traceur-runtime": "github:jmcriffey/bower-traceur-runtime@0.0.88"
+    }
+  }
+}

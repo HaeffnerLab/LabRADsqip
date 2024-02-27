@@ -1,0 +1,13 @@
+Tips and tricks as well as locations of (some) important files:
+
+All experiments in the script scanner inherit from the class "pulse_sequence" @ "common/devel/bum/sequences". This class implements all the necessary stuff that a pulse sequence might need like when it starts, what channels it excites and how long the pulses should last. Methods include "addTTL", "addDDS" and "addSequence" etc. 
+
+The "experiment" class seems to be a red herring that has long since been deprecated. If you found an experiment that you want to modify that inherits from the "experiment" class, more likely than not, that's not what you are looking for.
+
+All the experiments (and subsequences like StateReadout) for sqip is under "sqip/Pulsesequence2" and inherit appropriately from the "pulse_sequence" class.
+
+In order to add an experiment to the script scanner, you should add the import path and the appropriate class name as a tuple to the sequences variable in the "configuration.py" file @ "common/devel/bum/scriptscanner2". This is also where the script scanner server is if you want to look at how it works under the hood.
+
+All the paths for the servers can be found from google chrome localhost:7667 -> Top Left: Registry -> Nodes -> sqip_expcontrol and clicking on the directories 
+
+
