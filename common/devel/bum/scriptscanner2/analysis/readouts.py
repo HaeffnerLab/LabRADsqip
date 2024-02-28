@@ -76,6 +76,11 @@ def pmt_simple(readouts, threshold , readout_mode = 'pmt'):
         excitation = np.sum(np.array(excitation))
 
         perc_excited = [excitation]
+
+    if readout_mode == 'total_pmt_counts':
+        #just gives raw pmt total counts
+        total_counts=np.sum([i*readouts[i] for i in range(len(readouts))])
+        perc_excited=[total_counts]
        
    
     return perc_excited 

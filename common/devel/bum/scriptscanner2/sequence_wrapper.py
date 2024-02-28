@@ -876,6 +876,7 @@ class pulse_sequence_wrapper(object):
         
     def col_names(self):
         mode = self.parameters_dict.StateReadout.readout_mode  
+        print self.output_size()
         names = np.array(range(self.output_size())[::-1])+1
          
         if mode == 'pmt':
@@ -925,6 +926,14 @@ class pulse_sequence_wrapper(object):
                 dependents.append(temp)
             dependents.append(('', 'Parity', ''))
 
+
+        if mode == 'total_pmt_counts':
+            if self.output_size==1:
+                dependents = [('', 'prob dark ', '')]
+            else:
+                dependents = [('', 'num dark {}'.format(x), '') for x in names ]        
+
+
         return  dependents
     
 
@@ -944,6 +953,10 @@ class pulse_sequence_wrapper(object):
         if  mode == 'pmt_excitation':
             # col for excitation only
             return 1
+
+        if  mode == 'total_pmt_counts':
+            # col for excitation only
+            return 1 
         
         if mode == 'camera':
             return int(self.parameters_dict.IonsOnCamera.ion_number)

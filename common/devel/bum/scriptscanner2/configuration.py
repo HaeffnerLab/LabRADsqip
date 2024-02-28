@@ -16,7 +16,8 @@ class config(object):
         #('sqip.Pulsesequence2.Heating_Rate', 'Heating_Rate'),
         ('sqip.Pulsesequence2.Heating_Rate_Rabi', 'Heating_Rate_Rabi'),
         #('sqip.Pulsesequence2.Heating_Rate_BlueRabi', 'Heating_Rate_BlueRabi'),
-        ('sqip.Pulsesequence2.ScanMicromotion', 'ScanMicromotion')
+        ('sqip.Pulsesequence2.ScanMicromotion', 'ScanMicromotion'),
+        ('sqip.Pulsesequence2.OptimizeDopplerCooling', 'Calibrations_DopplerCooling')
         
         
         
