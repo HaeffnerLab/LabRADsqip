@@ -1,3 +1,4 @@
 common_backup
 space_time
 lattice
+*.pyc
