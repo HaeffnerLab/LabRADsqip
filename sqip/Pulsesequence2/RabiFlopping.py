@@ -77,7 +77,7 @@ class RabiFlopping(pulse_sequence):
         
     @classmethod
     def run_initial(cls,cxn, parameters_dict):
-	cxn.normalpmtflow.set_mode("Normal")
+        cxn.normalpmtflow.set_mode("Normal")
         pass
 
     @classmethod
@@ -87,7 +87,7 @@ class RabiFlopping(pulse_sequence):
 
     @classmethod
     def run_finally(cls,cxn, parameters_dict, data, x):
-	cxn.normalpmtflow.set_mode("Differential")
+        cxn.normalpmtflow.set_mode("Differential")
         pass
         # print "switching the 866 back to ON"
         # cxn.pulser.switch_manual('866DP', True)

@@ -43,6 +43,7 @@ class script_scanner_gui(QtGui.QWidget):
             self.disable(True)
         yield self.cxn.add_on_connect('ScriptScanner',self.reinitialize_scriptscanner)
         yield self.cxn.add_on_disconnect('ScriptScanner',self.disable)
+        print "Script scanner fully launched. asjfakfahsdjashfkjahfjkshkdjfhsjkdfhdkhgdhgl"
     
     @inlineCallbacks
     def reinitialize_scriptscanner(self):

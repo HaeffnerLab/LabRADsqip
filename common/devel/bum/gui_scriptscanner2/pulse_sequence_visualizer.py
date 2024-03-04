@@ -95,7 +95,7 @@ class pulse_sequence_visualizer(QtGui.QWidget):
     # Asynchronously subscribe to the pulser server, listing the below-defined function "on_new_sequence" as the function to execute when a signal is received
     def subscribe_pulser(self):
         pulser = yield self.cxn.get_server('Pulser')
-        yield pulser.signal__sequence_programmed(config_visualizer.ID, context = self.context)
+        yield pulser.signal__sequence_programmed(config_visualizer.ID, context = self.context) #this is the problematic line that gives an error, the method signal__sequence_programmed is not defined anywhere
         yield pulser.addListener(listener = self.on_new_sequence, source = None, ID = config_visualizer.ID, context = self.context)
         self.subscribed = True
                 
@@ -207,8 +207,8 @@ class pulse_sequence_visualizer(QtGui.QWidget):
     
 if __name__=="__main__":
     a = QtGui.QApplication( [] )
-    import qt4reactor
-    qt4reactor.install()
+    #import qt4reactor
+    #qt4reactor.install()
     from twisted.internet import reactor
     widget = pulse_sequence_visualizer(reactor)
     widget.show()

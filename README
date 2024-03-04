@@ -10,4 +10,4 @@ In order to add an experiment to the script scanner, you should add the import p
 
 All the paths for the servers can be found from google chrome localhost:7667 -> Top Left: Registry -> Nodes -> sqip_expcontrol and clicking on the directories 
 
-
+If you are wondering what the yield statement does in the code, its a part of the twisted package which lets you do stuff asynchronously. The yield statements work in tandem with the inlineCallbacks decorator which consists of an infinite loop and each time you yield something it feeds that value back to the function so that it can resume. The main idea is that you should always yield if you need to call a function or method that makes reference to a different server. (I think?)
